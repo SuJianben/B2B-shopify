@@ -87,6 +87,7 @@
     />
     
     <SearchModal ref="searchRef" />
+    
 
   </header>
 </template>
