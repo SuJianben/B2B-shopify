@@ -1,0 +1,39 @@
+/* === 1. 全局布局样式 (从 App.vue 搬过来的) === */
+body, .app-wrapper {
+  overflow-x: hidden; /* ⭐ 核心修改：禁止任何子元素撑破屏幕宽度 */
+  width: 100%;
+}
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #f7f8fa;
+    /* 灰色大背景 */
+    font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', Arial, sans-serif;
+}
+
+.app-wrapper {
+    width: 100%;
+    background-color: #f7f8fa;
+    display: flex;
+    /* 确保内容居中 */
+    justify-content: center;
+}
+
+.site-container {
+    width: 100%;
+    max-width: 1400px;
+    /* 限制最大宽度 */
+    background-color: #ffffff;
+    /* 白纸背景 */
+    position: relative;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.05);
+    /* 阴影 */
+    margin: 0 auto;
+}
+
+/* 手机端适配 */
+@media (max-width: 1440px) {
+    .site-container {
+        max-width: 100%;
+    }
+}

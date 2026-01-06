@@ -1,0 +1,17 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Vue B2B Theme",
+    "theme_author": "Me",
+    "theme_version": "1.0.0",
+    "theme_documentation_url": "https://github.com/shopify/dawn",
+    "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "Global Settings",
+    "settings": [
+      { "type": "header", "content": "Vue App Config" },
+      { "type": "paragraph", "content": "Main configuration for Vue App." }
+    ]
+  }
+]

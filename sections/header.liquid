@@ -1,0 +1,95 @@
+{% assign main_menu_handle = section.settings.menu | default: 'main-menu' %}
+{% assign main_menu_links = linklists[main_menu_handle].links %}
+
+<script type="application/json" id="shopify-menu-data">
+{
+  "menu": [
+    {% for link in main_menu_links %}
+    {
+      "label": "{{ link.title | escape }}",
+      "url": "{{ link.url }}",
+      "active": {{ link.active }},
+      "children": [
+        {% for child_link in link.links %}
+        {
+          "label": "{{ child_link.title | escape }}",
+          "url": "{{ child_link.url }}",
+          "children": [
+            {% for grand_child_link in child_link.links %}
+            {
+              "label": "{{ grand_child_link.title | escape }}",
+              "url": "{{ grand_child_link.url }}"
+            }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        }{% unless forloop.last %},{% endunless %}
+        {% endfor %}
+      ]
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "social": {
+    "facebook": "{{ section.settings.social_facebook }}",
+    "twitter": "{{ section.settings.social_twitter }}",
+    "youtube": "{{ section.settings.social_youtube }}",
+    "instagram": "{{ section.settings.social_instagram }}"
+  }
+}
+</script>
+
+<div id="app">
+</div>
+
+{% schema %}
+{
+  "name": "Vue Header",
+  "class": "section-header",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "选择顶部菜单",
+      "default": "main-menu"
+    },
+    {
+      "type": "header",
+      "content": "社媒链接 (填入链接即显示图标)"
+    },
+    {
+      "type": "text",
+      "id": "social_facebook",
+      "label": "Facebook Link"
+    },
+    {
+      "type": "text",
+      "id": "social_twitter",
+      "label": "Twitter / X Link"
+    },
+    {
+      "type": "text",
+      "id": "social_youtube",
+      "label": "YouTube Link"
+    },
+    {
+      "type": "text",
+      "id": "social_instagram",
+      "label": "Instagram Link"
+    },
+    {
+      "type": "header",
+      "content": "其他配置"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "联系电话",
+      "default": "020-88888888"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue 主程序"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html class="no-js" lang="{{ request.locale.iso_code }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <title>{{ shop.name }}</title>
+    {{ content_for_header }}
+    
+    {{ 'vue-bundle.css' | asset_url | stylesheet_tag }}
+    {{ 'base.css' | asset_url | stylesheet_tag }}
+    
+    <style>
+      [v-cloak], 
+      #app:not([data-v-app]) { 
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s ease-in-out;
+      }
+      #app[data-v-app] {
+        opacity: 1;
+        visibility: visible;
+      }
+    </style>
+
+  </head>
+  <body>
+    
+    <div class="app-wrapper">
+      
+      <div class="site-container">
+
+        {% section 'header' %}
+
+        <main role="main" id="MainContent">
+          {{ content_for_layout }}
+        </main>
+
+      </div>
+    </div>
+    <script src="{{ 'vue-bundle.js' | asset_url }}" defer></script>
+  </body>
+</html>

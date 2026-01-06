@@ -1,0 +1,103 @@
+{% comment %} sections/home-hero.liquid {% endcomment %}
+
+{% assign slide_blocks = section.blocks | where: 'type', 'slide' %}
+{% assign feature_blocks = section.blocks | where: 'type', 'feature' %}
+{% assign grid_items = section.blocks | where: 'type', 'grid_item' %}
+
+{% capture hero_config %}
+{
+  "slides": [
+    {% for block in slide_blocks %}
+      {
+        "image": "{% if block.settings.image %}{{ block.settings.image | image_url: width: 2000 }}{% else %}https://images.unsplash.com/photo-1473968512647-3e447244af8f{% endif %}",
+        "title": {{ block.settings.title | default: '' | json }},
+        "subtitle": {{ block.settings.subtitle | default: '' | json }},
+        "titleBold": {{ block.settings.title_bold | default: '' | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "features": [
+    {% for block in feature_blocks %}
+      {
+        "text": {{ block.settings.text | default: '' | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "contentCard": {
+    "title": {{ section.settings.card_title | default: '' | json }},
+    "subtitle": {{ section.settings.card_subtitle | default: '' | json }},
+    "btnText": {{ section.settings.card_btn_text | default: '' | json }},
+    "items": [
+      {% for block in grid_items %}
+        {
+          "image": "{% if block.settings.image %}{{ block.settings.image | image_url: width: 1000 }}{% else %}https://images.unsplash.com/photo-1527977966376-1c8408f9f108{% endif %}",
+          "title": {{ block.settings.title | default: '' | json }},
+          "subtitle": {{ block.settings.subtitle | default: '' | json }},
+          "link": {{ block.settings.link | default: '' | json }},
+          "btnText": {{ block.settings.btn_text | default: '' | json }}
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ]
+  }
+}
+{% endcapture %}
+
+<div 
+  class="vue-home-hero-root" 
+  data-settings='{{ hero_config }}'
+  style="min-height: 800px; display: block;"
+>
+</div>
+
+{% schema %}
+{
+  "name": "Vue Home Hero",
+  "settings": [
+    { "type": "header", "content": "Content Card Settings" },
+    { "type": "text", "id": "card_title", "label": "Card Title", "default": "STIMULATE CURIOSITY" },
+    { "type": "textarea", "id": "card_subtitle", "label": "Card Subtitle", "default": "Showcase and interpret works of art." },
+    { "type": "text", "id": "card_btn_text", "label": "Explore Button", "default": "EXPLORE ALL" }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Hero Slide",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Professional" },
+        { "type": "text", "id": "title", "label": "Title", "default": "DRONE" },
+        { "type": "text", "id": "title_bold", "label": "Bold Title", "default": "SERVICES" }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature Item",
+      "settings": [
+        { "type": "textarea", "id": "text", "label": "Feature Text", "default": "We support OEM/ODM solutions." }
+      ]
+    },
+    {
+      "type": "grid_item",
+      "name": "Card Grid Item",
+      "limit": 3,
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image" },
+        { "type": "text", "id": "title", "label": "Main Text", "default": "SHOP" },
+        { "type": "text", "id": "subtitle", "label": "Sub Text", "default": "Antique" },
+        { "type": "text", "id": "btn_text", "label": "Button Text (Center Only)", "default": "Shop Now" },
+        { "type": "url", "id": "link", "label": "Link" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Home Hero",
+      "blocks": [
+        { "type": "slide" }, { "type": "slide" },
+        { "type": "feature" }, { "type": "feature" }, { "type": "feature" },
+        { "type": "grid_item" }, { "type": "grid_item" }, { "type": "grid_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
