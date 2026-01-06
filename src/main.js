@@ -3,6 +3,7 @@ import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import App from './App.vue'
 import HomeHero from './components/home-hero/HomeHero.vue'
+import FeaturedProducts from './components/home-product/FeaturedProducts.vue'
 
 const mountPoint = document.getElementById('app')
 
@@ -66,11 +67,41 @@ const initHeroSections = () => {
   })
 }
 
+// 3. 初始化 Featured Products (新增逻辑)
+const initFeaturedProducts = () => {
+  const roots = document.querySelectorAll('.vue-featured-products-root')
+  
+  roots.forEach(el => {
+    if (el.dataset.__vueMounted) return;
+
+    let settings = {}
+    try {
+      if (el.dataset.settings) {
+        settings = JSON.parse(el.dataset.settings)
+      }
+    } catch (e) {
+      console.error('Featured Products JSON Error:', e)
+    }
+
+    const app = createApp(FeaturedProducts, {
+      data: settings
+    })
+    
+    app.use(ElementPlus)
+    app.mount(el)
+    el.dataset.__vueMounted = true
+  })
+}
+
 document.addEventListener('DOMContentLoaded', initHeroSections)
+document.addEventListener('DOMContentLoaded', initFeaturedProducts)
 
 // 3. 监听 Shopify 编辑器事件 (实现热重载)
 document.addEventListener('shopify:section:load', (e) => {
   if (e.target.querySelector('.vue-home-hero-root')) {
     initHeroSections()
+  }
+  if (e.target.querySelector('.vue-featured-products-root')) {
+    initFeaturedProducts()
   }
 })
