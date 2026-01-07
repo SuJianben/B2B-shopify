@@ -1,0 +1,60 @@
+{% comment %} sections/footer-vue.liquid {% endcomment %}
+
+{% capture footer_data %}
+{
+  "logo": "{% if section.settings.logo %}{{ section.settings.logo | image_url: width: 300 }}{% endif %}",
+  "description": {{ section.settings.description | json }},
+  
+  "menu1Title": {{ linklists[section.settings.menu_1].title | json }},
+  "menu1": [
+    {% for link in linklists[section.settings.menu_1].links %}
+      { "text": {{ link.title | json }}, "url": "{{ link.url }}" }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  
+  "menu2Title": {{ linklists[section.settings.menu_2].title | json }},
+  "menu2": [
+    {% for link in linklists[section.settings.menu_2].links %}
+      { "text": {{ link.title | json }}, "url": "{{ link.url }}" }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+<div id="vue-footer-root" data-settings='{{ footer_data | escape }}'></div>
+
+{% schema %}
+{
+  "name": "Vue Footer",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Footer Logo"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Brand Description",
+      "default": "Claritas processus dynamicus recmicus sequitu cmicus qituconsut."
+    },
+    {
+      "type": "link_list",
+      "id": "menu_1",
+      "label": "About Menu",
+      "default": "footer"
+    },
+    {
+      "type": "link_list",
+      "id": "menu_2",
+      "label": "Products Menu",
+      "default": "main-menu"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Footer"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,59 @@
+{% comment %} sections/featured-products.liquid {% endcomment %}
+
+{% assign limit = section.settings.limit %}
+{% assign target_collection = collections[section.settings.collection] %}
+
+{% capture vue_data %}
+{
+  "title": {{ section.settings.title | json }},
+  "products": [
+    {% if target_collection != blank %}
+      {% for product in target_collection.products limit: limit %}
+        {
+          "id": {{ product.id }},
+          "title": {{ product.title | json }},
+          "url": "{{ product.url }}",
+          "image": "{% if product.featured_image %}{{ product.featured_image | image_url: width: 600 }}{% endif %}"
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    {% endif %}
+  ]
+}
+{% endcapture %}
+
+<div 
+  class="vue-featured-products-root" 
+  data-settings='{{ vue_data | escape }}'
+></div>
+
+{% schema %}
+{
+  "name": "Featured Grid (Carousel)",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "PRODUCTS"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "min": 8,
+      "max": 24,
+      "step": 8,
+      "label": "Total Products (Multiples of 8)",
+      "default": 16,
+      "info": "Choose 8, 16, or 24 to fill pages perfectly."
+    }
+  ],
+  "presets": [
+    { "name": "Featured Grid (Carousel)" }
+  ]
+}
+{% endschema %}
