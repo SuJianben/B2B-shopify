@@ -1,0 +1,12 @@
+/* templates/product.json */
+{
+  "sections": {
+    "main": {
+      "type": "main-product-vue.liquid", 
+      "settings": {}
+    }
+  },
+  "order": [
+    "main"
+  ]
+}

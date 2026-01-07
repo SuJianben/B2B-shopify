@@ -1,0 +1,68 @@
+{% capture breadcrumb_json %}
+[
+  {"text": "HOME", "link": "{{ routes.root_url }}"},
+  {% if collection %}
+    {"text": "{{ collection.title | escape }}", "link": "{{ collection.url }}"},
+  {% endif %}
+  {"text": "{{ product.title | escape }}", "link": "#"}
+]
+{% endcapture %}
+
+{% capture product_json %}
+{
+  "id": {{ product.id }},
+  "title": "{{ product.title | escape }}",
+  "price": {{ product.price }},
+  "description": {{ product.description | json }}, 
+  "url": "{{ product.url }}",
+  "media": [
+    {% for media in product.media %}
+      {
+        "id": {{ media.id }},
+        "src": "{{ media | image_url: width: 1000 }}",
+        "alt": "{{ media.alt | escape }}"
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "metafields": {
+    "bucket_capacity": "{{ product.metafields.my_fields.bucket_capacity | default: '0.025m³' }}",
+    "working_device": "{{ product.metafields.my_fields.working_device | default: 'backhoe' }}"
+  }
+}
+{% endcapture %}
+
+{% assign banner_bg = section.settings.custom_banner | image_url: width: 1920 %}
+{% if banner_bg == blank %}
+  {% assign banner_bg = 'https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png' %}
+{% endif %}
+
+<div
+  id="vue-product-app"
+  class="vue-section-full-width"
+  data-product="{{ product_json | escape }}"
+  data-breadcrumbs="{{ breadcrumb_json | escape }}"
+  data-banner-img="{{ banner_bg }}"
+></div>
+
+{% schema %}
+{
+  "name": "Vue Product Main",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_banner",
+      "label": "Breadcrumb Background Image",
+      "info": "Upload the gray background image here."
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Product Main"
+    }
+  ]
+}
+{% endschema %}
