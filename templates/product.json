@@ -2,7 +2,7 @@
 {
   "sections": {
     "main": {
-      "type": "main-product-vue", 
+      "type": "main-product-vue.liquid", 
       "settings": {}
     }
   },

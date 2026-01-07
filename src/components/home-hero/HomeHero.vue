@@ -42,7 +42,7 @@ const heroData = computed(() => {
 
 <style scoped>
 .home-hero-section {
-  padding-bottom: 80px;
+  padding-bottom: 50px;
 }
 
 /* === ⭐ 核心修复：智能突围布局 === */
