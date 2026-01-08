@@ -1,48 +1,16 @@
+{% comment %} --- 1. 面包屑数据 --- {% endcomment %}
 {% capture breadcrumb_json %}
 [
   {"text": "HOME", "link": "{{ routes.root_url }}"},
-  {% if collection %}
-    {"text": "{{ collection.title | escape }}", "link": "{{ collection.url }}"},
-  {% endif %}
-  {"text": "{{ product.title | escape }}", "link": "#"}
+  {"text": "{{ collection.title | escape }}", "link": "{{ collection.url }}"}
 ]
 {% endcapture %}
 
-{% capture product_json %}
-{
-  "id": {{ product.id }},
-  "title": "{{ product.title | escape }}",
-  "price": {{ product.price }},
-  "description": {{ product.description | json }},
-  "url": "{{ product.url }}",
-  "media": [
-    {% for media in product.media %}
-      {
-        "id": {{ media.id }},
-        "src": "{{ media | image_url: width: 1000 }}",
-        "alt": "{{ media.alt | escape }}"
-      }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  ],
-  "metafields": {
-    "bucket_capacity": "{{ product.metafields.my_fields.bucket_capacity | default: '0.025m³' }}",
-    "working_device": "{{ product.metafields.my_fields.working_device | default: 'backhoe' }}",
-    
-    {% comment %} --- [修复] 使用 metafield_tag 过滤器 --- {% endcomment %}
-    {% comment %} metafield_tag 会自动将 Rich Text (富文本) 转换为 HTML 字符串 {% endcomment %}
-    "product_detail": {{ product.metafields.custom.product_detail | metafield_tag | json }},
-    "product_tags": {{ product.metafields.custom.product_tags | metafield_tag | json }}
-  }
-}
-{% endcapture %}
-
-{% comment %} --- 1. 底部相关产品逻辑 (Related Products) --- {% endcomment %}
-{% assign selected_collection = collections[section.settings.related_collection] %}
-{% assign related_title = section.settings.related_title | default: 'Products categories' %}
-{% capture related_products_json %}
-[
-  {% if selected_collection != blank %}
-    {% for prod in selected_collection.products limit: 8 %}
+{% comment %} --- 2. 产品数据 & 分页数据 (关键修改) --- {% endcomment %}
+{% paginate collection.products by 12 %}
+  {% capture collection_products_json %}
+  [
+    {% for prod in collection.products %}
       {
         "id": {{ prod.id }},
         "title": "{{ prod.title | escape }}",
@@ -51,11 +19,21 @@
         "price": {{ prod.price }}
       }{% unless forloop.last %},{% endunless %}
     {% endfor %}
-  {% endif %}
-]
-{% endcapture %}
+  ]
+  {% endcapture %}
 
-{% comment %} --- 2. 侧边栏菜单逻辑 (Sidebar Menu) --- {% endcomment %}
+  {% comment %} [新增] 捕获分页元数据 {% endcomment %}
+  {% capture pagination_json %}
+  {
+    "current_page": {{ paginate.current_page }},
+    "total_pages": {{ paginate.pages }},
+    "total_items": {{ paginate.items }},
+    "page_size": {{ paginate.page_size }}
+  }
+  {% endcapture %}
+{% endpaginate %}
+
+{% comment %} --- 3. 侧边栏菜单 --- {% endcomment %}
 {% assign sidebar_linklist = linklists[section.settings.sidebar_menu] %}
 {% capture sidebar_menu_json %}
 [
@@ -79,7 +57,7 @@
 ]
 {% endcapture %}
 
-{% comment %} --- 3. [新增] 侧边栏推荐产品逻辑 (Sidebar Recommended) --- {% endcomment %}
+{% comment %} --- 4. 侧边栏推荐 --- {% endcomment %}
 {% assign sidebar_rec_collection = collections[section.settings.sidebar_rec_collection] %}
 {% assign sidebar_rec_title = section.settings.sidebar_rec_title | default: 'RECOMMENDED' %}
 {% capture sidebar_rec_json %}
@@ -97,19 +75,25 @@
 ]
 {% endcapture %}
 
-{% assign banner_bg = section.settings.custom_banner | image_url: width: 1920 %}
-{% if banner_bg == blank %}
+{% comment %} --- 5. Banner 图片逻辑 --- {% endcomment %}
+{% assign target_image = section.settings.custom_banner %}
+{% if target_image == blank %}
+  {% assign target_image = collection.image %}
+{% endif %}
+{% if target_image != blank %}
+  {% assign banner_bg = target_image | image_url: width: 1920 %}
+{% else %}
   {% assign banner_bg = 'https://cdn.shopify.com/s/files/1/0533/2089/files/placeholder-images-image_large.png' %}
 {% endif %}
 
 <div
-  id="vue-product-app"
+  id="vue-collection-app"
   class="vue-section-full-width"
-  data-product="{{ product_json | escape }}"
+  data-collection-title="{{ collection.title | escape }}"
+  data-products="{{ collection_products_json | escape }}"
+  data-pagination="{{ pagination_json | escape }}"
   data-breadcrumbs="{{ breadcrumb_json | escape }}"
   data-banner-img="{{ banner_bg }}"
-  data-related="{{ related_products_json | escape }}"
-  data-related-title="{{ related_title | escape }}"
   data-sidebar-menu="{{ sidebar_menu_json | escape }}"
   data-sidebar-rec="{{ sidebar_rec_json | escape }}"
   data-sidebar-rec-title="{{ sidebar_rec_title | escape }}"
@@ -117,7 +101,7 @@
 
 {% schema %}
 {
-  "name": "Vue Product Main",
+  "name": "Vue Collection Main",
   "settings": [
     {
       "type": "header",
@@ -126,16 +110,16 @@
     {
       "type": "image_picker",
       "id": "custom_banner",
-      "label": "Breadcrumb Background Image"
+      "label": "Custom Banner Image"
     },
     {
       "type": "header",
-      "content": "Sidebar Menu"
+      "content": "Sidebar Settings"
     },
     {
       "type": "link_list",
       "id": "sidebar_menu",
-      "label": "Sidebar Categories Menu"
+      "label": "Sidebar Menu"
     },
     {
       "type": "header",
@@ -150,27 +134,12 @@
     {
       "type": "collection",
       "id": "sidebar_rec_collection",
-      "label": "Select Recommended Collection"
-    },
-    {
-      "type": "header",
-      "content": "Bottom Related Slider"
-    },
-    {
-      "type": "text",
-      "id": "related_title",
-      "label": "Section Title",
-      "default": "Products categories"
-    },
-    {
-      "type": "collection",
-      "id": "related_collection",
-      "label": "Select Collection"
+      "label": "Recommended Collection"
     }
   ],
   "presets": [
     {
-      "name": "Vue Product Main"
+      "name": "Vue Collection Main"
     }
   ]
 }

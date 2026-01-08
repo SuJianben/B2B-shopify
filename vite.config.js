@@ -1,15 +1,15 @@
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import { fileURLToPath, URL } from 'node:url'
+import { defineConfig } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import { fileURLToPath, URL } from 'node:url';
 
 export default defineConfig({
   plugins: [vue()],
   define: { 'process.env': {} }, // 修复 process 报错
   resolve: {
     alias: {
-      'vue': 'vue/dist/vue.esm-bundler.js',
-      '@': fileURLToPath(new URL('./src', import.meta.url)) // 修复 @ 路径
-    }
+      vue: 'vue/dist/vue.esm-bundler.js',
+      '@': fileURLToPath(new URL('./src', import.meta.url)), // 修复 @ 路径
+    },
   },
   build: {
     outDir: 'assets',
@@ -18,13 +18,19 @@ export default defineConfig({
       entry: 'src/main.js',
       name: 'VueTheme',
       fileName: 'vue-bundle',
-      formats: ['iife']
+      formats: ['iife'],
     },
     rollupOptions: {
+      input: 'src/main.js',
       output: {
         entryFileNames: 'vue-bundle.js',
-        assetFileNames: 'vue-bundle.[ext]' // 强制生成 vue-bundle.css
-      }
-    }
-  }
-})
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            return 'vue-bundle.css';
+          }
+          return '[name][extname]';
+        },
+      },
+    },
+  },
+});
