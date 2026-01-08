@@ -45,9 +45,8 @@ const items = computed(() => props.breadcrumbs);
   margin-top: 30px;
   margin-bottom: 30px;
 
-  /* 4. 高度与圆角 */
+  /* 4. 高度 */
   height: 300px;
-  border-radius: 4px; /* 加一点圆角，更精致 */
   
   /* 5. 阴影：因为它凸出去了，加个阴影会让它看起来更有层次感 */
   box-shadow: 0 10px 20px rgba(0,0,0,0.15);

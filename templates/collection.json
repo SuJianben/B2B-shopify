@@ -1,8 +1,7 @@
-/* templates/product.json */
 {
   "sections": {
     "main": {
-      "type": "main-product-vue", 
+      "type": "main-collection-vue",
       "settings": {}
     }
   },

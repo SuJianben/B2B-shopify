@@ -13,6 +13,7 @@ import HomeAbout from './components/home-about/HomeAbout.vue'
 import HomeRecommended from './components/home-recommended/HomeRecommended.vue' 
 import HomeNews from './components/home-news/HomeNews.vue' 
 import HomeLogos from './components/home-logos/HomeLogos.vue' 
+import CollectionDetail from './components/collection/CollectionDetail.vue';
 import AppFooter from './components/footer/Footer.vue'; // [来自 Main] 新增 Footer
 
 // ==========================================
@@ -136,7 +137,7 @@ const initFeaturedProducts = () => {
 // ==========================================
 const initRecommended = () => {
   const roots = document.querySelectorAll('.vue-home-recommended-root')
-  
+
   roots.forEach(el => {
     if (el.dataset.__vueMounted) return;
 
@@ -161,7 +162,7 @@ const initRecommended = () => {
 // ==========================================
 const initHomeAbout = () => {
   const roots = document.querySelectorAll('.vue-home-about-root')
-  
+
   roots.forEach(el => {
     if (el.dataset.__vueMounted) return;
 
@@ -220,7 +221,45 @@ const initLogos = () => {
 }
 
 // ==========================================
-// 9. 初始化 Footer (来自 Main 的新增逻辑)
+//  9. 初始化 Collection Page
+// ==========================================
+const initCollectionApp = () => {
+  const root = document.getElementById('vue-collection-app');
+  if (!root || root.dataset.__vueMounted) return;
+
+  try {
+    const productsData = JSON.parse(root.dataset.products || '[]');
+    const breadcrumbsData = JSON.parse(root.dataset.breadcrumbs || '[]');
+    const bannerImg = root.dataset.bannerImg || '';
+    const sidebarMenu = JSON.parse(root.dataset.sidebarMenu || '[]');
+    const sidebarRec = JSON.parse(root.dataset.sidebarRec || '[]');
+    const sidebarRecTitle = root.dataset.sidebarRecTitle || 'RECOMMENDED';
+    const collectionTitle = root.dataset.collectionTitle || 'Collection';
+
+    // [新增] 读取分页数据
+    const paginationData = JSON.parse(root.dataset.pagination || '{}');
+
+    const app = createApp(CollectionDetail, {
+      collectionTitle,
+      productsData,
+      breadcrumbsData,
+      bannerImg,
+      sidebarMenu,
+      sidebarRec,
+      sidebarRecTitle,
+      paginationData // [新增]
+    });
+
+    app.use(ElementPlus);
+    app.mount(root);
+    root.dataset.__vueMounted = true;
+  } catch (e) {
+    console.error('Collection App JSON Error:', e);
+  }
+};
+
+// ==========================================
+// 10. 初始化 Footer (来自 Main 的新增逻辑)
 // ==========================================
 const initFooter = () => {
   // 这里的 ID 'vue-footer-root' 对应我们在 liquid 里写的 <div id="vue-footer-root">
@@ -244,7 +283,7 @@ const initFooter = () => {
 };
 
 // ==========================================
-// 10. 事件监听与执行 (整合所有功能)
+// 11. 事件监听与执行 (整合所有功能)
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
   initHeader();           // 初始化 Header
@@ -255,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initRecommended();      // [Main] 初始化 Home Recommended
   initNews();             // [Main] 初始化 Home News
   initLogos();            // [Main] 初始化 Home Logos
+  initCollectionApp();    // [Main] 初始化 Collection
   initFooter();           // [Main] 初始化 Footer
 });
 

@@ -1,60 +1,44 @@
 <template>
-  <div class="product-detail-page">
-    <BreadcrumbBanner 
-      :image="bannerImg" 
-      :breadcrumbs="breadcrumbList" 
+  <ProductLayout
+    :banner-img="bannerImg"
+    :breadcrumbs="breadcrumbList"
+    :sidebar-menu="sidebarMenuList"
+    :sidebar-rec="sidebarRecList"
+    :sidebar-rec-title="sidebarRecTitle"
+  >
+    
+    <ProductRightContent 
+      :product="product"
+      :related-products="relatedList"
+      :related-title="relatedTitle"
     />
 
-    <div class="page-width main-content-wrapper">
-      <el-row :gutter="40">
-        
-        <el-col :xs="24" :md="6">
-          <ProductSidebar />
-        </el-col>
-
-        <el-col :xs="24" :md="18">
-          <ProductMainInfo :product="product" />
-        </el-col>
-
-      </el-row>
-    </div>
-  </div>
+  </ProductLayout>
 </template>
 
 <script setup>
 import { computed } from 'vue';
-import BreadcrumbBanner from './BreadcrumbBanner.vue';
-// 引入新组件
-import ProductSidebar from './ProductSidebar.vue';
-import ProductMainInfo from './ProductMainInfo.vue';
+import ProductLayout from './ProductLayout.vue'; 
+import ProductRightContent from './ProductRightContent.vue';
 
+// 接收 main.js 传来的所有原始数据
 const props = defineProps({
   productData: Object,
   breadcrumbsData: Array,
-  bannerImg: String
+  bannerImg: String,
+  relatedProducts: Array,
+  relatedTitle: String,
+  sidebarMenu: Array,
+  sidebarRec: Array,
+  sidebarRecTitle: String
 });
 
-const product = computed(() => props.productData);
+// 计算属性 (保持不变)
+const product = computed(() => props.productData || {});
 const breadcrumbList = computed(() => props.breadcrumbsData);
+const relatedList = computed(() => props.relatedProducts || []);
+const relatedTitle = computed(() => props.relatedTitle || 'Products categories');
+const sidebarMenuList = computed(() => props.sidebarMenu || []);
+const sidebarRecList = computed(() => props.sidebarRec || []);
+const sidebarRecTitle = computed(() => props.sidebarRecTitle || 'RECOMMENDED');
 </script>
-
-<style scoped>
-.product-detail-page {
-  width: 100%;
-  padding-bottom: 50px;
-}
-
-/* 核心内容区的容器，确保居中且有宽度限制 */
-.main-content-wrapper {
-  max-width: 1400px; /* 限制最大宽 */
-  margin: 0 auto;    /* 居中 */
-  padding: 40px 20px; /* 上下留白 */
-}
-
-/* 手机端适配调整 */
-@media (max-width: 992px) {
-  .main-content-wrapper {
-    padding: 20px;
-  }
-}
-</style>
