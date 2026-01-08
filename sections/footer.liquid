@@ -2,20 +2,43 @@
 
 {% capture footer_data %}
 {
-  "logo": "{% if section.settings.logo %}{{ section.settings.logo | image_url: width: 300 }}{% endif %}",
-  "description": {{ section.settings.description | json }},
-  
-  "menu1Title": {{ linklists[section.settings.menu_1].title | json }},
-  "menu1": [
-    {% for link in linklists[section.settings.menu_1].links %}
-      { "text": {{ link.title | json }}, "url": "{{ link.url }}" }{% unless forloop.last %},{% endunless %}
-    {% endfor %}
-  ],
-  
-  "menu2Title": {{ linklists[section.settings.menu_2].title | json }},
-  "menu2": [
-    {% for link in linklists[section.settings.menu_2].links %}
-      { "text": {{ link.title | json }}, "url": "{{ link.url }}" }{% unless forloop.last %},{% endunless %}
+  "columns": [
+    {% for block in section.blocks %}
+      {
+        "id": "{{ block.id }}",
+        "type": "{{ block.type }}",
+        "settings": {
+          {% case block.type %}
+            
+            {% when 'brand_block' %}
+              "logo": "{% if block.settings.logo %}{{ block.settings.logo | image_url: width: 300 }}{% endif %}",
+              "logo_width": {{ block.settings.logo_width | default: 180 }},
+              "mobile_logo_width": {{ block.settings.mobile_logo_width | default: 180 }},
+              "description": {{ block.settings.description | json }},
+              "show_social": {{ block.settings.show_social | json }},
+              "social_links": {
+                "facebook": "{{ settings.social_facebook_link }}",
+                "twitter": "{{ settings.social_twitter_link }}",
+                "instagram": "{{ settings.social_instagram_link }}"
+              }
+
+            {% when 'menu_block' %}
+              "title": {{ block.settings.title | json }},
+              "links": [
+                {% for link in linklists[block.settings.menu].links %}
+                  { "text": {{ link.title | json }}, "url": "{{ link.url }}" }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+              ]
+
+            {% when 'info_block' %}
+              "title": {{ block.settings.title | json }},
+              "address": {{ block.settings.address | json }},
+              "phone": {{ block.settings.phone | json }},
+              "email": {{ block.settings.email | json }}
+
+          {% endcase %}
+        }
+      }{% unless forloop.last %},{% endunless %}
     {% endfor %}
   ]
 }
@@ -25,35 +48,53 @@
 
 {% schema %}
 {
-  "name": "Vue Footer",
+  "name": "Vue Footer Modular",
+  "max_blocks": 5,
   "settings": [
+     { "type": "header", "content": "Layout is controlled by Blocks" }
+  ],
+  "blocks": [
     {
-      "type": "image_picker",
-      "id": "logo",
-      "label": "Footer Logo"
+      "type": "brand_block",
+      "name": "Brand / Logo",
+      "limit": 1,
+      "settings": [
+        { "type": "image_picker", "id": "logo", "label": "Logo Image" },
+        { "type": "range", "id": "logo_width", "label": "PC Logo Width", "min": 0, "max": 300, "step": 5, "unit": "px", "default": 180 },
+        { "type": "range", "id": "mobile_logo_width", "label": "Mobile Logo Width", "min": 0, "max": 300, "step": 5, "unit": "px", "default": 180 },
+        { "type": "textarea", "id": "description", "label": "Description", "default": "Your brand story here." },
+        { "type": "checkbox", "id": "show_social", "label": "Show Social Icons", "default": true }
+      ]
     },
     {
-      "type": "textarea",
-      "id": "description",
-      "label": "Brand Description",
-      "default": "Claritas processus dynamicus recmicus sequitu cmicus qituconsut."
+      "type": "menu_block",
+      "name": "Menu Column",
+      "settings": [
+        { "type": "text", "id": "title", "label": "Heading", "default": "Quick Links" },
+        { "type": "link_list", "id": "menu", "label": "Select Menu" }
+      ]
     },
     {
-      "type": "link_list",
-      "id": "menu_1",
-      "label": "About Menu",
-      "default": "footer"
-    },
-    {
-      "type": "link_list",
-      "id": "menu_2",
-      "label": "Products Menu",
-      "default": "main-menu"
+      "type": "info_block",
+      "name": "Store Info",
+      "limit": 1,
+      "settings": [
+        { "type": "text", "id": "title", "label": "Heading", "default": "Store Information" },
+        { "type": "text", "id": "address", "label": "Address", "default": "Guangzhou City" },
+        { "type": "text", "id": "phone", "label": "Phone", "default": "020-88888888" },
+        { "type": "text", "id": "email", "label": "Email", "default": "contact@example.com" }
+      ]
     }
   ],
   "presets": [
     {
-      "name": "Vue Footer"
+      "name": "Vue Footer Modular",
+      "blocks": [
+        { "type": "brand_block" },
+        { "type": "menu_block" },
+        { "type": "menu_block" },
+        { "type": "info_block" }
+      ]
     }
   ]
 }

@@ -21,9 +21,15 @@ export default defineConfig({
       formats: ['iife']
     },
     rollupOptions: {
+      input: 'src/main.js',
       output: {
         entryFileNames: 'vue-bundle.js',
-        assetFileNames: 'vue-bundle.[ext]' // 强制生成 vue-bundle.css
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith('.css')) {
+            return 'vue-bundle.css';
+          }
+          return '[name][extname]';
+        }
       }
     }
   }

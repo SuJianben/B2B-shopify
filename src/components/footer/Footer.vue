@@ -3,7 +3,7 @@
     
     <FooterTopBar @open-contact="dialogVisible = true" />
 
-    <FooterMainContent :isMobile="isMobile" />
+    <FooterMainContent :isMobile="isMobile" :settings="settings" />
 
     <FooterCopyright />
 
@@ -28,6 +28,10 @@ const dialogVisible = ref(false)
 const windowWidth = ref(window.innerWidth)
 const isMobile = computed(() => windowWidth.value <= 990) // 使用 990px 作为断点
 
+defineProps({
+  settings: { type: Object, default: () => ({}) }
+})
+
 const updateWidth = () => {
   windowWidth.value = window.innerWidth
 }
@@ -44,6 +48,6 @@ onUnmounted(() => {
 <style scoped>
 .site-footer {
   width: 100%;
-  margin-top: 60px; /* 与上方分区的间距 */
+  /* margin-top: 60px;  */
 }
 </style>

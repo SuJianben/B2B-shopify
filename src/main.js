@@ -9,6 +9,10 @@ import AppHeader from './App.vue'; // 对应 Main 分支的重命名，指向 He
 import HomeHero from './components/home-hero/HomeHero.vue';
 import ProductDetail from './components/product/ProductDetail.vue'; // [来自 HEAD] 新增产品详情
 import FeaturedProducts from './components/home-product/FeaturedProducts.vue'; // [来自 Main] 新增推荐产品
+import HomeAbout from './components/home-about/HomeAbout.vue' 
+import HomeRecommended from './components/home-recommended/HomeRecommended.vue' 
+import HomeNews from './components/home-news/HomeNews.vue' 
+import HomeLogos from './components/home-logos/HomeLogos.vue' 
 import AppFooter from './components/footer/Footer.vue'; // [来自 Main] 新增 Footer
 
 // ==========================================
@@ -128,7 +132,95 @@ const initFeaturedProducts = () => {
 };
 
 // ==========================================
-// 5. 初始化 Footer (来自 Main 的新增逻辑)
+// 5. 初始化 Home Recommended (新增逻辑)
+// ==========================================
+const initRecommended = () => {
+  const roots = document.querySelectorAll('.vue-home-recommended-root')
+  
+  roots.forEach(el => {
+    if (el.dataset.__vueMounted) return;
+
+    let settings = {}
+    try {
+      if (el.dataset.settings) {
+        settings = JSON.parse(el.dataset.settings)
+      }
+    } catch (e) {
+      console.error('Recommended JSON Error:', e)
+    }
+
+    const app = createApp(HomeRecommended, { data: settings })
+    app.use(ElementPlus) 
+    app.mount(el)
+    el.dataset.__vueMounted = true
+  })
+}
+
+// ==========================================
+// 6. 初始化 Home About (来自 Main 的新增逻辑)
+// ==========================================
+const initHomeAbout = () => {
+  const roots = document.querySelectorAll('.vue-home-about-root')
+  
+  roots.forEach(el => {
+    if (el.dataset.__vueMounted) return;
+
+    let settings = {}
+    try {
+      if (el.dataset.settings) {
+        settings = JSON.parse(el.dataset.settings)
+      }
+    } catch (e) {
+      console.error('Home About JSON Error:', e)
+    }
+
+    const app = createApp(HomeAbout, { settings })
+    // 如果用到了 ElementPlus 记得 use，没用到可以不加，这个组件纯 CSS 写的其实不需要
+    app.use(ElementPlus) 
+    app.mount(el)
+    el.dataset.__vueMounted = true
+  })
+}
+
+// ==========================================
+// 7. 初始化 Home News (新增逻辑)
+// ==========================================
+const initNews = () => {
+  const roots = document.querySelectorAll('.vue-home-news-root')
+  roots.forEach(el => {
+    if (el.dataset.__vueMounted) return;
+    let settings = {}
+    try {
+      if (el.dataset.settings) settings = JSON.parse(el.dataset.settings)
+    } catch (e) { console.error(e) }
+
+    const app = createApp(HomeNews, { data: settings })
+    app.use(ElementPlus)
+    app.mount(el)
+    el.dataset.__vueMounted = true
+  })
+}
+
+// ==========================================
+// 8. 初始化 Home Logos (新增逻辑)
+// ==========================================
+const initLogos = () => {
+  const roots = document.querySelectorAll('.vue-home-logos-root')
+  roots.forEach(el => {
+    if (el.dataset.__vueMounted) return;
+    let settings = {}
+    try {
+      if (el.dataset.settings) settings = JSON.parse(el.dataset.settings)
+    } catch (e) { console.error(e) }
+
+    const app = createApp(HomeLogos, { data: settings })
+    app.mount(el)
+    el.dataset.__vueMounted = true
+  })
+}
+
+// ==========================================
+// 9. 初始化 Footer (来自 Main 的新增逻辑)
 // ==========================================
 const initFooter = () => {
   // 这里的 ID 'vue-footer-root' 对应我们在 liquid 里写的 <div id="vue-footer-root">
@@ -152,14 +244,17 @@ const initFooter = () => {
 };
 
 // ==========================================
-// 6. 事件监听与执行 (整合所有功能)
+// 10. 事件监听与执行 (整合所有功能)
 // ==========================================
-
 document.addEventListener('DOMContentLoaded', () => {
   initHeader();           // 初始化 Header
   initHeroSections();     // 初始化 Hero
   initProductApp();       // [HEAD] 初始化 Product Detail
   initFeaturedProducts(); // [Main] 初始化 Featured Products
+  initHomeAbout();       // [Main] 初始化 Home About
+  initRecommended();      // [Main] 初始化 Home Recommended
+  initNews();             // [Main] 初始化 Home News
+  initLogos();            // [Main] 初始化 Home Logos
   initFooter();           // [Main] 初始化 Footer
 });
 
@@ -183,7 +278,27 @@ document.addEventListener('shopify:section:load', (e) => {
     initFeaturedProducts();
   }
 
-  // 4. [Main] 检查 Footer
+  // 4. [Main] 检查 Home About
+  if (target.querySelector('.vue-home-about-root')) {
+    initHomeAbout();
+  }
+
+  // 5. [Main] 检查 Home Recommended
+  if (target.querySelector('.vue-home-recommended-root')) {
+    initRecommended();
+  }
+
+  // 6. [Main] 检查 Home News
+  if (target.querySelector('.vue-home-news-root')) {
+    initNews();
+  }
+
+  // 7. [Main] 检查 Home Logos
+  if (target.querySelector('.vue-home-logos-root')) {
+    initLogos();
+  }
+
+  // 8. [Main] 检查 Footer
   if (target.querySelector('#vue-footer-root')) {
     initFooter();
   }

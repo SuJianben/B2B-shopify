@@ -1,0 +1,76 @@
+{% comment %} sections/home-logos-vue.liquid {% endcomment %}
+
+{% capture section_data %}
+{
+  "title": {{ section.settings.title | json }},
+  
+  "logo_width_pc": {{ section.settings.logo_width_pc | default: 150 }},     "logo_width_mb": {{ section.settings.logo_width_mb | default: 100 }},     "blocks": [
+    {% for block in section.blocks %}
+      {
+        "id": "{{ block.id }}",
+        "image": "{% if block.settings.image %}{{ block.settings.image | image_url: width: 300 }}{% endif %}",
+        "link": "{{ block.settings.link }}"
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+<div class="vue-home-logos-root" data-settings='{{ section_data | escape }}'></div>
+
+{% schema %}
+{
+  "name": "Vue Logo Grid",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Heading (Optional)",
+      "default": "Trusted by Industry Leaders"
+    },
+    /* ⭐ 新增：尺寸控制区域 */
+    {
+      "type": "header",
+      "content": "Logo Size Settings"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_pc",
+      "label": "Logo Max Width (Desktop)",
+      "min": 50,
+      "max": 250,
+      "step": 5,
+      "default": 150,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "logo_width_mb",
+      "label": "Logo Max Width (Mobile)",
+      "min": 30,
+      "max": 150,
+      "step": 5,
+      "default": 100,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "logo_item",
+      "name": "Logo",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Logo Image" },
+        { "type": "url", "id": "link", "label": "Link (Optional)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Logo Grid",
+      "blocks": [
+        { "type": "logo_item" }, { "type": "logo_item" }, { "type": "logo_item" }, { "type": "logo_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}
