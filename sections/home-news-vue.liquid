@@ -1,0 +1,54 @@
+{% comment %} sections/home-news-vue.liquid {% endcomment %}
+
+{% capture section_data %}
+{
+  "title": {{ section.settings.title | json }},
+  "articles": [
+    {% assign blog = blogs[section.settings.blog] %}
+    {% for article in blog.articles limit: section.settings.limit %}
+      {
+        "id": {{ article.id }},
+        "title": {{ article.title | json }},
+        "excerpt": {{ article.excerpt_or_content | strip_html | truncate: 120 | json }},
+        "url": "{{ article.url }}",
+        "image": "{% if article.image %}{{ article.image | image_url: width: 600 }}{% endif %}"
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+<div class="vue-home-news-root" data-settings='{{ section_data | escape }}'></div>
+
+{% schema %}
+{
+  "name": "Vue Home News",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "NEWS"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "Select Blog"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Article Limit",
+      "min": 3,
+      "max": 9,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Home News"
+    }
+  ]
+}
+{% endschema %}

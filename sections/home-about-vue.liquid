@@ -1,0 +1,62 @@
+{% comment %} sections/home-about-vue.liquid {% endcomment %}
+
+{% capture section_data %}
+{
+  "bg_image": "{% if section.settings.bg_image %}{{ section.settings.bg_image | image_url: width: 2000 }}{% endif %}",
+  "title": {{ section.settings.title | json }},
+  "description": {{ section.settings.description | json }},
+  "btn_label": {{ section.settings.btn_label | json }},
+  "btn_link": "{{ section.settings.btn_link }}",
+  "enable_parallax": {{ section.settings.enable_parallax | json }}  
+}
+{% endcapture %}
+
+<div class="vue-home-about-root" data-settings='{{ section_data | escape }}'></div>
+
+{% schema %}
+{
+  "name": "Vue Home About",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    },
+    /* ⭐ 新增：视差滚动开关 */
+    {
+      "type": "checkbox",
+      "id": "enable_parallax",
+      "label": "Enable Parallax Effect (Fixed Background)",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "ABOUT"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "We are committed to providing our customers with super exceptional service..."
+    },
+    {
+      "type": "text",
+      "id": "btn_label",
+      "label": "Button Label",
+      "default": "LEARN MORE"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button Link"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Home About"
+    }
+  ]
+}
+{% endschema %}

@@ -305,5 +305,6 @@ onUnmounted(() => {
   .featured-products-section {
     padding: 0px 20px 50px;
   }
+  .section-title { font-size: 24px; }
 }
 </style>

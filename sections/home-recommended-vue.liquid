@@ -1,0 +1,53 @@
+{% comment %} sections/home-recommended-vue.liquid {% endcomment %}
+
+{% capture section_data %}
+{
+  "title": {{ section.settings.title | json }},
+  "products": [
+    {% assign collection = collections[section.settings.collection] %}
+    {% for product in collection.products limit: section.settings.limit %}
+      {
+        "id": {{ product.id }},
+        "title": {{ product.title | json }},
+        "url": "{{ product.url }}",
+        "image": "{{ product.featured_image | image_url: width: 600 }}"
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+<div class="vue-home-recommended-root" data-settings='{{ section_data | escape }}'></div>
+
+{% schema %}
+{
+  "name": "Vue Recommended",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "Recommended PRODUCTS"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Select Collection"
+    },
+    {
+      "type": "range",
+      "id": "limit",
+      "label": "Product Limit",
+      "min": 3,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    }
+  ],
+  "presets": [
+    {
+      "name": "Vue Recommended Products"
+    }
+  ]
+}
+{% endschema %}
