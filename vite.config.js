@@ -29,8 +29,8 @@ export default defineConfig({
             return 'vue-bundle.css';
           }
           return '[name][extname]';
-        },
-      },
-    },
-  },
-});
+        }
+      }
+    }
+  }
+})
