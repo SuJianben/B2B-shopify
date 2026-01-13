@@ -7,8 +7,8 @@ import 'element-plus/dist/index.css';
 // ==========================================
 import AppHeader from './App.vue'; // 对应 Main 分支的重命名，指向 Header
 import HomeHero from './components/home-hero/HomeHero.vue';
-import ProductDetail from './components/product/ProductDetail.vue'; // [来自 HEAD] 新增产品详情
-import FeaturedProducts from './components/home-product/FeaturedProducts.vue'; // [来自 Main] 新增推荐产品
+import ProductDetail from './components/product/ProductDetail.vue'; 
+import FeaturedProducts from './components/home-product/FeaturedProducts.vue'; 
 import HomeAbout from './components/home-about/HomeAbout.vue' 
 import HomeRecommended from './components/home-recommended/HomeRecommended.vue' 
 import HomeNews from './components/home-news/HomeNews.vue' 

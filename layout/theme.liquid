@@ -41,5 +41,11 @@
       </div>
     </div>
     <script src="{{ 'vue-bundle.js' | asset_url }}" defer></script>
+    <script>
+      // 定义一个全局配置对象
+      window.themeConfig = {
+        contactApiUrl: "{{ settings.gas_contact_url }}"
+      };
+    </script>
   </body>
 </html>
