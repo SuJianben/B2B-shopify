@@ -69,26 +69,29 @@ const emit = defineEmits(['update:visible'])
 
 const loading = ref(false)
 const formRef = ref(null)
+// 初始化为空，等待 fetchLocation 填充
 const formData = reactive({ name: '', email: '', phone: '', message: '', city: '' , country: ''})
 
-// 2. ⭐ 新增：自动获取 IP 位置的函数
+// === 1. 自动获取 IP 位置 (真实逻辑) ===
 const fetchLocation = async () => {
   try {
-    // 使用免费的 ipapi 接口
+    // 使用 ipapi.co (免费、HTTPS支持)
     const response = await fetch('https://ipapi.co/json/')
     const data = await response.json()
     
     if (data.city && data.country_name) {
       formData.city = data.city
       formData.country = data.country_name
-      console.log('Auto-detected location:', formData.city, formData.country)
+      // 仅供调试查看，上线可删除
+      console.log('📍 Auto-detected:', formData.city, formData.country)
     }
   } catch (e) {
-    console.warn('Location detection failed, using default.')
+    // 如果失败（比如由广告插件拦截），保持为空即可，后端会处理
+    console.warn('Location detection skipped (AdBlock or Network error).')
   }
 }
 
-// === 1. 响应式判断逻辑 ===
+// === 2. 响应式判断逻辑 ===
 const windowWidth = ref(window.innerWidth)
 const updateWidth = () => windowWidth.value = window.innerWidth
 const isMobile = computed(() => windowWidth.value <= 768)
@@ -116,28 +119,37 @@ const submitToShopify = async () => {
     if (valid) {
       loading.value = true
       try {
-        // 1. 你的 Google Apps Script URL (刚才复制的)
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbwbku6KZFsfYZwVXe8xfR1vp_17MbSiVRYm6h6zz2oGQUNju3lHoH3RnkJFDNjMtcEx/exec'
+        const GAS_URL = window.themeConfig?.contactApiUrl;
+        if (!GAS_URL) {
+          throw new Error('API URL is missing! Please check Theme Settings.')
+        }
 
-        // 2. 准备数据 (JSON 对象)
+        // === 核心：使用真实数据 ===
         const payload = {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           message: formData.message,
-          city: formData.city,
-          country: formData.country
+          
+          // ⭐ 这里不再写死！如果 fetchLocation 成功，这里就有值
+          // 如果失败，传空字符串，GAS 后端会处理为空的情况
+          city: formData.city || "", 
+          country: formData.country || "",
+          
+          shop_domain: window.Shopify?.shop || 'test-app-english.myshopify.com'
         }
 
-        // 3. 发送请求
-        // ⭐ 技巧：这里不加 headers: {'Content-Type': 'application/json'}
-        // 而是利用 fetch 默认行为发送 text/plain，这能避开复杂的 CORS 预检
+        // === 发送请求 (针对 GAS 优化) ===
         const response = await fetch(GAS_URL, {
           method: 'POST',
+          redirect: "follow", // 跟随 GAS 的 302 重定向
+          headers: {
+            // 欺骗浏览器发送简单请求，避开 CORS 预检
+            "Content-Type": "text/plain;charset=utf-8", 
+          },
           body: JSON.stringify(payload)
         })
 
-        // GAS 成功通常返回 200，内容是 JSON
         const result = await response.json()
 
         if (result.result === 'success') {
@@ -145,14 +157,13 @@ const submitToShopify = async () => {
           emit('update:visible', false)
           formRef.value.resetFields()
         } else {
-          throw new Error('Script returned error')
+          // 如果后端虽然返回了 JSON 但标记为 error
+          throw new Error(result.error || 'Unknown script error')
         }
 
       } catch (error) {
-        console.error('GAS Error:', error)
-        // GAS 有时因为重定向问题，fetch 可能会抛出异常但实际数据已写入
-        // 如果你发现数据进表格了但前端报错，可以把这里改宽容一点
-        ElMessage.error('Failed to send. Please try again.')
+        console.error('Submission Failed:', error)
+        ElMessage.error('Failed: ' + error.message)
       } finally {
         loading.value = false
       }

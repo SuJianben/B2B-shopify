@@ -13,5 +13,20 @@
       { "type": "header", "content": "Vue App Config" },
       { "type": "paragraph", "content": "Main configuration for Vue App." }
     ]
+  },
+  {
+    "name": "API Integrations",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Google Apps Script"
+      },
+      {
+        "type": "text",
+        "id": "gas_contact_url",
+        "label": "Contact Form Web App URL",
+        "info": "Paste the deployed web app URL from Google Apps Script here."
+      }
+    ]
   }
 ]
