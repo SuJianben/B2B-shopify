@@ -1,0 +1,25 @@
+{
+  "sections": {
+    "banner": {
+      "type": "vue-about-banner",
+      "settings": {
+        "title": "HOME > ABOUT"
+      }
+    },
+    "content": {
+      "type": "vue-about-content",
+      "settings": {
+        "title": "ABOUT US",
+        "content": "<p>We are committed to providing our customers...</p>"
+      }
+    },
+    "form": {
+      "type": "vue-about-form"
+    }
+  },
+  "order": [
+    "banner",
+    "content",
+    "form"
+  ]
+}

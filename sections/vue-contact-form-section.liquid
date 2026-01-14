@@ -1,0 +1,33 @@
+{% schema %}
+{
+  "name": "Vue Contact Page Form",
+  "settings": [
+    { 
+      "type": "text", 
+      "id": "form_title", 
+      "label": "Form Header Title", 
+      "default": "Leave Your Message" 
+    },
+    { 
+      "type": "color", 
+      "id": "theme_color", 
+      "label": "Theme Color", 
+      "default": "#e0a84d" 
+    }
+  ],
+  "presets": [{ "name": "Vue Contact Page Form" }]
+}
+{% endschema %}
+
+{% capture props_json %}
+{
+  "title": "{{ section.settings.form_title | escape }}",
+  "themeColor": "{{ section.settings.theme_color }}"
+}
+{% endcapture %}
+
+<div 
+  class="vue-section-root" 
+  data-component="ContactForm" 
+  data-props="{{ props_json | escape }}"
+></div>

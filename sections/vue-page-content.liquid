@@ -1,0 +1,36 @@
+{% schema %}
+{
+  "name": "Vue Page Content",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show Page Title",
+      "default": true
+    }
+  ],
+  "presets": [{ "name": "Vue Page Content" }]
+}
+{% endschema %}
+
+{% comment %}
+  复用 AboutContent 组件。
+  虽然名字叫 AboutContent，但它的逻辑是 (Title + HTML)，完全适用于通用页面。
+{% endcomment %}
+
+{% capture props_json %}
+{
+  "title": "{% if section.settings.show_title %}{{ page.title | escape }}{% endif %}",
+  "content": {{ page.content | json }}
+}
+{% endcapture %}
+
+<div 
+  class="vue-section-root" 
+  data-component="AboutContent" 
+  data-props="{{ props_json | escape }}"
+></div>

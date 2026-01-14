@@ -1,0 +1,38 @@
+{% schema %}
+{
+  "name": "Vue Contact Info",
+  "settings": [],
+  "blocks": [
+    {
+      "type": "info_block",
+      "name": "Info Block",
+      "settings": [
+        { "type": "image_picker", "id": "icon", "label": "Icon (PNG/SVG)" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Address" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>123 Street Name, City</p>" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Vue Contact Info" }]
+}
+{% endschema %}
+
+{% capture props_json %}
+{
+  "blocks": [
+    {% for block in section.blocks %}
+      {
+        "icon": "{{ block.settings.icon | image_url: width: 100 }}",
+        "title": "{{ block.settings.title | escape }}",
+        "content": {{ block.settings.content | json }}
+      }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}
+{% endcapture %}
+
+<div 
+  class="vue-section-root" 
+  data-component="ContactInfo" 
+  data-props="{{ props_json | escape }}"
+></div>

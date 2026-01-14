@@ -1,0 +1,42 @@
+{% schema %}
+{
+  "name": "Vue Page Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "default_image",
+      "label": "Default Banner Image",
+      "info": "All generic pages will use this image"
+    }
+  ],
+  "presets": [{ "name": "Vue Page Banner" }]
+}
+{% endschema %}
+
+{% comment %}
+  核心区别：
+  这里不再用 section.settings.title
+  而是用 page.title (Shopify 自动提供的当前页面对象)
+{% endcomment %}
+
+{% capture props_json %}
+{
+  "image": "{{ section.settings.default_image | image_url: width: 1920 }}",
+  "breadcrumbs": [
+    {
+      "text": "HOME",
+      "link": "/"
+    },
+    {
+      "text": "{{ page.title | escape }}",
+      "link": ""
+    }
+  ]
+}
+{% endcapture %}
+
+<div 
+  class="vue-section-root" 
+  data-component="BreadcrumbBanner" 
+  data-props="{{ props_json | escape }}"
+></div>

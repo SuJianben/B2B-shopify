@@ -1,0 +1,42 @@
+{% schema %}
+{
+  "name": "Vue About Banner",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "bg_image",
+      "label": "Background Image"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Page Title",
+      "default": "ABOUT US",
+      "info": "Just enter the page name (e.g., 'ABOUT'). 'HOME' is added automatically."
+    }
+  ],
+  "presets": [{ "name": "Vue About Banner" }]
+}
+{% endschema %}
+
+{% capture props_json %}
+{
+  "image": "{{ section.settings.bg_image | image_url: width: 1920 }}",
+  "breadcrumbs": [
+    {
+      "text": "HOME",
+      "link": "/"
+    },
+    {
+      "text": "{{ section.settings.title | default: 'ABOUT' | escape }}",
+      "link": ""
+    }
+  ]
+}
+{% endcapture %}
+
+<div
+  class="vue-section-root"
+  data-component="BreadcrumbBanner"
+  data-props="{{ props_json | escape }}"
+></div>

@@ -69,39 +69,40 @@ const emit = defineEmits(['update:visible'])
 
 const loading = ref(false)
 const formRef = ref(null)
-// 初始化为空，等待 fetchLocation 填充
+// 初始化数据
 const formData = reactive({ name: '', email: '', phone: '', message: '', city: '' , country: ''})
 
-// === 1. 自动获取 IP 位置 (真实逻辑) ===
+// === 修改后的位置获取逻辑 ===
 const fetchLocation = async () => {
+  // 🟢 策略 1 (首选): Ipinfo.io
+  // 优势：每月5万次免费，Token隔离，不受VPN共享IP影响，含城市信息
+  const IPINFO_TOKEN = '925ddc3573a788'; // 🔴 请替换为你的 Token
+
   try {
-    // 使用 ipapi.co (免费、HTTPS支持)
-    const response = await fetch('https://ipapi.co/json/')
+    const response = await fetch(`https://ipinfo.io/json?token=${IPINFO_TOKEN}`)
+    
+    if (!response.ok) throw new Error('Ipinfo limit or error')
+    
     const data = await response.json()
     
-    if (data.city && data.country_name) {
-      formData.city = data.city
-      formData.country = data.country_name
-      // 仅供调试查看，上线可删除
-      console.log('📍 Auto-detected:', formData.city, formData.country)
+    if (data.country && data.city) {
+      // ipinfo 返回的国家是简写 (如 CN, US)，需要转全称
+      const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+      formData.country = regionNames.of(data.country); 
+      formData.city = data.city;
+      
+      console.log(`📍 Location (Ipinfo): ${formData.city}, ${formData.country}`)
+      return; // 成功拿到，直接结束
     }
   } catch (e) {
-    // 如果失败（比如由广告插件拦截），保持为空即可，后端会处理
-    console.warn('Location detection skipped (AdBlock or Network error).')
+    console.warn('Primary API (Ipinfo) failed, switching to backup...', e)
   }
 }
-
-// === 2. 响应式判断逻辑 ===
-const windowWidth = ref(window.innerWidth)
-const updateWidth = () => windowWidth.value = window.innerWidth
-const isMobile = computed(() => windowWidth.value <= 768)
 
 // 组件挂载时获取位置
 onMounted(() => {
   fetchLocation()
 })
-onMounted(() => window.addEventListener('resize', updateWidth))
-onUnmounted(() => window.removeEventListener('resize', updateWidth))
 
 // 校验规则
 const rules = {
@@ -124,15 +125,13 @@ const submitToShopify = async () => {
           throw new Error('API URL is missing! Please check Theme Settings.')
         }
 
-        // === 核心：使用真实数据 ===
         const payload = {
           name: formData.name,
           email: formData.email,
           phone: formData.phone,
           message: formData.message,
           
-          // ⭐ 这里不再写死！如果 fetchLocation 成功，这里就有值
-          // 如果失败，传空字符串，GAS 后端会处理为空的情况
+          // 使用 formData 的值 (如果没有获取到，则为空字符串)
           city: formData.city || "", 
           country: formData.country || "",
           
@@ -142,9 +141,8 @@ const submitToShopify = async () => {
         // === 发送请求 (针对 GAS 优化) ===
         const response = await fetch(GAS_URL, {
           method: 'POST',
-          redirect: "follow", // 跟随 GAS 的 302 重定向
+          redirect: "follow", 
           headers: {
-            // 欺骗浏览器发送简单请求，避开 CORS 预检
             "Content-Type": "text/plain;charset=utf-8", 
           },
           body: JSON.stringify(payload)
@@ -157,7 +155,6 @@ const submitToShopify = async () => {
           emit('update:visible', false)
           formRef.value.resetFields()
         } else {
-          // 如果后端虽然返回了 JSON 但标记为 error
           throw new Error(result.error || 'Unknown script error')
         }
 
@@ -243,26 +240,26 @@ const submitToShopify = async () => {
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   transition: transform 0.2s;
 }
-.custom-close-btn:hover { transform: scale(1.1); }
+.custom-close-btn:hover { transform: scale(1.1);
+}
 
 /* === 2. 手机端样式优化 === */
 @media (max-width: 768px) {
   .modal-header-strip {
-    font-size: 16px;       /* 标题字号调小 */
-    padding: 12px 15px;    /* 标题内边距减小 */
+    font-size: 16px;
+    padding: 12px 15px;    
     margin-bottom: 20px;
   }
   
   .modal-content-wrapper {
-    padding: 0;            /* 移除内容区多余内边距 */
+    padding: 0;
   }
 
-  /* 调整关闭按钮：缩小并防止贴边太近 */
   .custom-close-btn {
     width: 26px;
     height: 26px;
-    top: -12px;   /* 稍微往回收一点 */
-    right: -10px; /* 稍微往回收一点，防止被屏幕切掉 */
+    top: -12px;
+    right: -10px; 
     font-size: 14px;
     border-width: 1.5px;
   }
@@ -274,19 +271,19 @@ const submitToShopify = async () => {
 .custom-contact-modal .el-dialog {
   border-radius: 4px;
   padding: 20px;
-  overflow: visible; /* 允许按钮悬浮 */
+  overflow: visible;
   box-shadow: 0 15px 30px rgba(0,0,0,0.2) !important;
-  max-width: 95vw; /* 防止手机上太宽撑爆屏幕 */
+  max-width: 95vw;
 }
 
-/* 手机端覆盖：减少弹窗留白，让内容显示更多 */
 @media (max-width: 768px) {
   .custom-contact-modal .el-dialog {
-    padding: 15px !important; /* 手机上白边留少一点 */
-    margin-top: 15vh !important; /* 调整垂直位置 */
+    padding: 15px !important;
+    margin-top: 15vh !important; 
   }
 }
 
-.custom-contact-modal .el-dialog__header { display: none; }
+.custom-contact-modal .el-dialog__header { display: none;
+}
 .custom-contact-modal .el-dialog__body { padding: 0 !important; }
 </style>

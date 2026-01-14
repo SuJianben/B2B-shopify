@@ -97,15 +97,22 @@ watch(() => props.productName, (newVal) => {
 
 // === 3. 自动获取 IP 位置 (直接复用你的代码) ===
 const fetchLocation = async () => {
+  const IPINFO_TOKEN = '925ddc3573a788'; // 🔴 请务必替换为你的 Ipinfo Token
+
+  // 🟢 Ipinfo
   try {
-    const response = await fetch('https://ipapi.co/json/')
+    const response = await fetch(`https://ipinfo.io/json?token=${IPINFO_TOKEN}`)
+    if (!response.ok) throw new Error('Ipinfo limit')
+    
     const data = await response.json()
-    if (data.city && data.country_name) {
-      formData.city = data.city
-      formData.country = data.country_name
+    if (data.country && data.city) {
+      const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+      formData.country = regionNames.of(data.country);
+      formData.city = data.city;
+      return;
     }
   } catch (e) {
-    console.warn('Location detection skipped.')
+    console.warn('Primary location API failed, trying backup...')
   }
 }
 

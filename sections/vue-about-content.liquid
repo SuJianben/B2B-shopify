@@ -1,0 +1,23 @@
+{% schema %}
+{
+  "name": "Vue About Content",
+  "settings": [
+    { "type": "text", "id": "title", "label": "Title", "default": "ABOUT" },
+    { "type": "richtext", "id": "content", "label": "Content Text" }
+  ],
+  "presets": [{ "name": "Vue About Content" }]
+}
+{% endschema %}
+
+{% capture props_json %}
+{
+  "title": "{{ section.settings.title | escape }}",
+  "content": {{ section.settings.content | json }} 
+}
+{% endcapture %}
+
+<div 
+  class="vue-section-root" 
+  data-component="AboutContent" 
+  data-props="{{ props_json | escape }}"
+></div>

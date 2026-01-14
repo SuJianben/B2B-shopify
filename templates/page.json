@@ -1,0 +1,18 @@
+{
+  "sections": {
+    "banner": {
+      "type": "vue-page-banner",
+      "settings": {}
+    },
+    "main": {
+      "type": "vue-page-content",
+      "settings": {
+        "show_title": true
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "main"
+  ]
+}

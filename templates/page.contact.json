@@ -1,0 +1,55 @@
+{
+  "sections": {
+    "banner": {
+      "type": "vue-page-banner",
+      "settings": {
+        "title": "CONTACT"
+      }
+    },
+    "info": {
+      "type": "vue-contact-info",
+      "blocks": {
+        "block_1": {
+          "type": "info_block",
+          "settings": {
+            "title": "Address",
+            "content": "<p>Guangzhou City, Guangdong Province</p>"
+          }
+        },
+        "block_2": {
+          "type": "info_block",
+          "settings": {
+            "title": "E-mail",
+            "content": "<p>youweb@qq.com<br>youweb@qq.com</p>"
+          }
+        },
+        "block_3": {
+          "type": "info_block",
+          "settings": {
+            "title": "Phone",
+            "content": "<p>Phone: 13988888888<br>Tel: 020-88888888</p>"
+          }
+        },
+        "block_4": {
+          "type": "info_block",
+          "settings": {
+            "title": "Whatsapp",
+            "content": "<p>13988888888</p>"
+          }
+        }
+      },
+      "block_order": ["block_1", "block_2", "block_3", "block_4"]
+    },
+    "form": {
+      "type": "vue-contact-form-section",
+      "settings": {
+        "theme_color": "#d6a549"
+      }
+    }
+  },
+  "order": [
+    "banner",
+    "info",
+    "form"
+  ]
+}
